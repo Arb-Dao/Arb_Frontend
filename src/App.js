@@ -54,6 +54,9 @@ let inPaths = [[1]]
 let numberOfSwaps = 1
 
 let pathindex = 0
+let moneyIn = 0;
+let moneyOut = 0;
+
 axisNumbers.push(""+(1))
 for (const [key, value] of Object.entries(json)){
   numberOfSwaps += 2
@@ -64,8 +67,10 @@ for (const [key, value] of Object.entries(json)){
   inPaths.push([1])
   inPaths.push([0])
 
-  console.log(key)
-
+  if (pathindex == 0){
+    moneyIn = value.TotalIn
+  }
+    moneyOut = value.TotalOut
   let found = false
   for (let i = 0; i<swapPaths[pathindex*2].length; i++){
     if (swapPaths[pathindex*2][i] == value.from)
@@ -78,7 +83,6 @@ for (const [key, value] of Object.entries(json)){
   for (let i = 0; i<swapPaths[pathindex*2+2].length; i++){
     if (swapPaths[pathindex*2+2][i] == value.to)
       found = true
-      console.log("found ", value.to)
   }
   if (!found)
     swapPaths[pathindex*2+2].push(value.to)
@@ -87,23 +91,18 @@ for (const [key, value] of Object.entries(json)){
   let pools2 = []
   let ins2 = []
   let inTot = 0
-  console.log("TTTT")
 
   for (const [key, value2] of Object.entries(value)){
     if (key != "from" && key != "to" && key != "TotalIn" && key!= "TotalOut"){
       pools2.push(key)
       ins2.push(Math.round(parseInt(value2)/parseInt(value.TotalIn) * 100) / 100
       )
-      console.log("ADDDING : "+value2)
     } 
     if (key == "TotalIn") {
       inTot = value.TotalIn
     }
   }
-  console.log("_______")
-  console.log(inPaths)
-  console.log(inPaths[1][2])
-  content.push(<div style = {{marginTop: "5%"}}> {key}: {value.from} >>> {value.to} </div>)
+  content.push(<div style = {{marginTop: "5%", width: "100%"}}> {key}: {value.from} >>> {value.to} </div>)
 
 
   // swapPaths.pop()
@@ -217,39 +216,105 @@ for (let i = 0; i<swapPaths.length; i++){
 
                   {page==='Home' ?
 
-                      (<div className='MainContent' style = {{width: "100%", height: "90%", backgroundColor: "rgb(75, 75, 75)",
+                      (<div className='MainContent' style = {{ height: "90%", backgroundColor: "rgb(75, 75, 75)",
                       display: 'flex',
                       flex: 1,
                       flexDirection: 'row',
                       alignItems: 'flex-start'}}>
-                        <div style = {{width: "50%", height: "100%", backgroundColor: "green",
+                        <div style = {{width: '20%',minWidth: "10%", maxWidth: "20%", height: "100%", backgroundColor: "rgb(165,165,165)",
                         display: 'flex',
                         flex: 1,
                         flexDirection: 'column',
                         alignItems: 'flex-start'}}>
-                          <div style={{width: "100%", height: "5%", justifySelf: "center", backgroundColor: "red"}}> 
-                              Swaps
+                          <div style={{width: "100%", height: "2.5%", justifySelf: "center", backgroundColor: "rgb(125,125,125)"}}> 
+                              Swap Paths
                           </div>
                           
-                            {/* for (const [key, value] of Object.entries(json)){
-                              <div> Hi </div>
-                            } */}
-                          {/* {Object.entries(json).map(function(key){
-                            return <div> {key} </div>
-                          })} */}
-                          
                           {content}
+
+                          <div style={{width: "100%", height: "2.5%", marginTop: "5%", justifySelf: "center", alignContent: "center", backgroundColor: "rgb(125,125,125)"}}> 
+                              Tokens in
+                          </div>
+                             {moneyIn}
                           
-                          
+                          <div style={{width: "100%", height: "2.5%", marginTop: "5%", justifySelf: "center", alignContent: "center", backgroundColor: "rgb(125,125,125)"}}> 
+                              Tokens out
+                          </div>
+                          {moneyOut}
+
+                          <div style={{width: "100%", height: "2.5%", marginTop: "5%", justifySelf: "center", alignContent: "center", backgroundColor: "rgb(125,125,125)"}}> 
+                              Gain
+                          </div>
+                           {Math.round(parseInt(moneyOut)/parseInt(moneyIn) * 100) - 100} %
+
                         </div>
-                        <div style = {{width: "20%", height: "100%", backgroundColor: "blue", marginLeft: "5%", marginRight: "2%", marginTop: "7.5%",
+                        <div style = {{width: "90%", height: "100%", backgroundColor: "rgb(185,185,185)",
                         display: 'flex',
                         flex: 1,
                         flexDirection: 'column',
                         alignItems: 'flex-start'}}>
-                          {/* <img src={tile1} className="tile1" alt="tile1" style = {{marginTop: "3%", width: '100%', height: '20%'}}/>
-                          <img src={tile1} className="tile1" alt="tile1" style = {{marginTop: "3%", width: '100%', height: '20%'}}/>
-                          <img src={tile1} className="tile1" alt="tile1" style = {{marginTop: "3%", width: '100%', height: '20%'}}/> */}
+                        <div style = {{height: "10%"}}> </div>
+                        <Line
+                        options = {
+                                    {
+                                      pointDot: true,
+
+                                      plugins: {
+                                        tooltip: {
+                                          enabled: true // <-- this option disables tooltips
+                                        },
+                                        hover: {mode: null},
+                                        legend: {
+                                          display: false,
+                                        },
+                                        ChartDataLabels,
+                                        datalabels: {
+                                          formatter: function(value, context) {
+                                            return value.pool
+                                        }
+                                        }
+
+                                      },
+
+                                      // removes mouseover stuff
+                                      // events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+                                      events: [],
+                                      scales: {
+                                        
+                                                // to remove the labels
+                                                x: {
+                                                  ticks: {
+                                                    display: false,
+                                                  },
+
+                                                  // to remove the x-axis grid
+                                                  grid: {
+                                                    drawBorder: false,
+                                                    display: false,
+                                                  },
+                                                },
+                                                // to remove the y-axis labels
+                                                y: {
+                                                  ticks: {
+                                                    display: false,
+                                                    beginAtZero: true,
+                                                  },
+                                                  // to remove the y-axis grid
+                                                  grid: {
+                                                    drawBorder: false,
+                                                    display: false,
+                                                  },
+                                                }
+                                      } 
+                                    }   
+                                  }        
+
+                        data = {{
+                          // x-axis label values
+                          labels:axisNumbers,
+                          datasets:swappathData,
+                        }}
+                      />
                         </div>
                       </div>)
 
