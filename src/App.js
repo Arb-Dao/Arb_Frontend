@@ -9,6 +9,7 @@ import Chart from 'chart.js/auto';
 import {CategoryScale} from 'chart.js'; 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import json from './output-for-front-end.json'
+import json2 from './output-for-front-end2.json'
 
 import { ethers } from "ethers";
 import { useState, } from "react";
@@ -27,6 +28,7 @@ function App() {
   var [address, setAddress] = useState('');
   var [balance, setBalance] = useState(0);
   var [connectText, setConnectText] = useState('Connect Wallet')
+  var [jsonpicker, setJsonPicker] = useState(true);
 
   const web3Modal = new Web3Modal({
     providerOptions: {},
@@ -45,20 +47,21 @@ function App() {
       console.log(error);
     }
   };
-console.log(json)
-let content = [];
+
+  let content = [];
 
 let axisNumbers = []
 let swapPaths = [[]]
 let inPaths = [[1]]
 let numberOfSwaps = 1
 
+
 let pathindex = 0
 let moneyIn = 0;
 let moneyOut = 0;
 
 axisNumbers.push(""+(1))
-for (const [key, value] of Object.entries(json)){
+for (const [key, value] of Object.entries(jsonpicker? json : json2)){
   numberOfSwaps += 2
   axisNumbers.push(""+(2*pathindex+2))
   axisNumbers.push(""+(2*pathindex+3))
@@ -110,10 +113,7 @@ for (const [key, value] of Object.entries(json)){
   inPaths[pathindex*2+1] = ins2
   pathindex += 1
 }
-console.log("swappaths: ", pathindex, " : ",swapPaths.length)
-console.log(axisNumbers)
 
-console.log(swapPaths)
 
 let maxheight = 0;
 for (let i = 0; i<swapPaths.length; i++){
@@ -204,7 +204,7 @@ for (let i = 0; i<swapPaths.length; i++){
                     <div className='fillerLeft' style={{width: '75%', height: "100%", backgroundColor: 'transparent', display: "flex"}}></div>
                     <div className='Sections' style={{marginLeft: '0.5%', marginRight: '0.5%', width: '30%', height: "100%", backgroundColor: 'transparent', display: "flex", flexDirection:'row', justifyContent: 'space-between', alignItems: 'center'}}>
                       <button style={buttonStyle} onClick = {()=> setPage('Home')}> Home </button>
-                      <button style={buttonStyle} onClick = {()=> setPage('Data')}> Data </button>
+                      <button style={buttonStyle} onClick = {()=> setJsonPicker(!jsonpicker)}> Data </button>
                       <button style={buttonStyle} onClick = {()=> setPage('Performance')}> Performance </button>
                       <button style={buttonStyle} onClick = {()=>{
                         connectWeb3Wallet();
@@ -235,7 +235,7 @@ for (let i = 0; i<swapPaths.length; i++){
                           <div style={{width: "100%", height: "2.5%", marginTop: "5%", justifySelf: "center", alignContent: "center", backgroundColor: "rgb(125,125,125)"}}> 
                               Tokens in
                           </div>
-                             {moneyIn}
+                          {moneyIn}
                           
                           <div style={{width: "100%", height: "2.5%", marginTop: "5%", justifySelf: "center", alignContent: "center", backgroundColor: "rgb(125,125,125)"}}> 
                               Tokens out
